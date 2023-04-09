@@ -191,7 +191,6 @@ struct PAIR
 	struct PAIR oldRes = { 0, 0, 1 };
 	int it1 = 0;
 	int it2 = 0;
-	int cnt = 0;
 	if (n == 2)
 	{
 		struct PAIR ans = solve2x2(matrix1, 0, 0, n2);
@@ -240,7 +239,6 @@ struct PAIR
 			}
 			oldRes = nu;
 		}
-		cnt++;
 	}
 	if (n > 0)
 	{
