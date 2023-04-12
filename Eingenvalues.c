@@ -316,8 +316,8 @@ void writeFile(FILE* f, double* ans, size_t n)
 		}
 		else
 		{
-			fprintf(f, "%g +%g\n", ans[i], ans[i + 1]);
-			fprintf(f, "%g -%g\n", ans[i], ans[i + 1]);
+			fprintf(f, "%g +%gi\n", ans[i], ans[i + 1]);
+			fprintf(f, "%g -%gi\n", ans[i], ans[i + 1]);
 		}
 	}
 }
