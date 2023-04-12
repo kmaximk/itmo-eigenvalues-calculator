@@ -45,6 +45,8 @@ jobs:
 
     env:
       EXE: __test.exe
+      STUPID_LINUX_LIBM: $(If ('${{ matrix.os }}' -eq 'windows-latest') {''} Else {'-lm'})
+      STUPID_CLANG15_FLAG: $(If ('${{ matrix.os }}' -eq 'windows-latest') {'-Wno-deprecated-non-prototype'} Else {''})
 
     steps:
       - uses: actions/checkout@v3
@@ -106,7 +108,9 @@ jobs:
           try 
           {
             $ErrorActionPreference = 'SilentlyContinue'
-            pwsh -Command { ${{env.COMPILER}} ${{env.C_ARGS}} ${{env.C_FILES}} -o ${{env.EXE}} *>&1 > ${{env.BUILDLOG}} } 
+            #pwsh -Command { ${{env.COMPILER}} ${{env.C_ARGS}} ${{env.C_FILES}} -o ${{env.EXE}} *>&1 > ${{env.BUILDLOG}} } 
+            & ${{env.COMPILER}} ${{env.C_ARGS}} ${{env.STUPID_CLANG15_FLAG}} ${{env.C_FILES}} -o ${{env.EXE}} ${{env.STUPID_LINUX_LIBM}} *>&1 > ${{env.BUILDLOG}}
+          
           } 
           catch 
           {
