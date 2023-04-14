@@ -194,7 +194,7 @@ double hesenberg(double* matrix1, double* vec, double* temp1, double* sums, size
 size_t householderQR(double* matrix1, double* temp, double* temp2, double* del, double* res, double* sums, size_t n, size_t n2, double delta)
 {
 	size_t it = 0;
-	struct PAIR oldRes;
+	struct PAIR oldRes = { 0, 0, 0 };
 	if (n == 2)
 	{
 		struct PAIR ans = solve2x2(matrix1, 0, 0, n2);
@@ -216,7 +216,6 @@ size_t householderQR(double* matrix1, double* temp, double* temp2, double* del, 
 	}
 	while (n > 1)
 	{
-		oldRes = solve2x2(matrix1, n - 2, n - 2, n2);
 		double shift = matrix1[(n - 1) * n2 + n - 1];
 		if (fabs(matrix1[(n - 1) * n2 + n - 2] - matrix1[(n - 2) * n2 + n - 1]) < 5e-300)
 		{
@@ -257,12 +256,20 @@ size_t householderQR(double* matrix1, double* temp, double* temp2, double* del, 
 		else
 		{
 			struct PAIR nu = solve2x2(matrix1, n - 2, n - 2, n2);
-			if (nu.compl &&fabs((oldRes.first - nu.first)) < delta && fabs((oldRes.second - nu.second)) < delta)
+			if (nu.compl &&oldRes.compl &&fabs((oldRes.first - nu.first)) < delta && fabs((oldRes.second - nu.second)) < delta)
 			{
 				res[it] = nu.first;
 				res[it + 1] = nu.second;
 				it += 2;
 				n -= 2;
+				if (n > 1)
+				{
+					oldRes = solve2x2(matrix1, n - 2, n - 2, n2);
+				}
+			}
+			else
+			{
+				oldRes = nu;
 			}
 		}
 	}
@@ -335,13 +342,13 @@ int main(int argv, char* argc[])
 {
 	if (argv != 3)
 	{
-		printf("Wrong number of arguments, expected 2\n");
+		fprintf(stderr, "Wrong number of arguments, expected 2\n");
 		return ERROR_PARAMETER_INVALID;
 	}
 	FILE* f = fopen(argc[1], "r");
 	if (!f)
 	{
-		printf("Can't open input file %s\n", argc[1]);
+		fprintf(stderr, "Can't open input file %s\n", argc[1]);
 		return ERROR_CANNOT_OPEN_FILE;
 	}
 	size_t n;
@@ -356,7 +363,7 @@ int main(int argv, char* argc[])
 	if (rCode != SUCCESS)
 	{
 		fclose(f);
-		printf("Not enough memory, memory allocation failed\n");
+		fprintf(stderr, "Not enough memory, memory allocation failed\n");
 		return rCode;
 	}
 	for (int i = 0; i < n; i++)
@@ -376,7 +383,7 @@ int main(int argv, char* argc[])
 	if (!f)
 	{
 		freeAll(matrix1, temp2, temp, del, ans, sums);
-		printf("Can't open output file %s\n", argc[2]);
+		fprintf(stderr, "Can't open output file %s\n", argc[2]);
 		return ERROR_CANNOT_OPEN_FILE;
 	}
 	writeFile(f, ans, it);
